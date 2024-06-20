@@ -1,0 +1,16 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: local
+---
+logging:
+  level:
+    root: info
+    org:
+      springframework:
+        web: info
