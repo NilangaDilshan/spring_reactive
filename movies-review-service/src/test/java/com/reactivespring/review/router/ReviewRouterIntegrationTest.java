@@ -6,27 +6,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-/*@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-@AutoConfigureWebTestClient
-@Slf4j*/
-//--------------------------------
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
-//--------------------------------
 @ActiveProfiles("test")
 @AutoConfigureWebTestClient
 @Slf4j
@@ -96,7 +86,7 @@ class ReviewRouterIntegrationTest extends AbstractMongodbBaseTest {
     void getAllReviewsTest() {
         //when
         this.webTestClient.get()
-                .uri(REVIEW_URL)
+                .uri(REVIEW_URL + "/all")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Review.class)
