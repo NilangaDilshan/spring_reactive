@@ -3,6 +3,7 @@ package com.reactivespring.moviesinfo.integration;
 import com.reactivespring.moviesinfo.domain.MovieInfo;
 import com.reactivespring.moviesinfo.repository.MovieInfoRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Ignore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,16 @@ class MovieInfoRepositoryIntegrationTest extends AbstractMongodbBaseTest {
     void tearDown() {
         log.info("tearDown");
         this.movieInfoRepository.deleteAll().block();
+    }
+
+    @Test
+    @Ignore
+    void addTestData() {
+        this.movieInfoRepository.saveAll(
+                List.of(
+                        new MovieInfo("1", "Batman Begins", 2005, List.of("Christian Bale", "Michael Caine", "Liam Neeson"), LocalDate.of(2005, 6, 15))
+                )
+        ).blockLast();
     }
 
     @Test

@@ -15,12 +15,12 @@ spring:
       port: 27017
       database: local
 ---
-spring:
-  config:
-    activate:
-      on-profile: non-prod
-  data:
-    mongodb:
-      host: localhost
-      port: 27017
-      database: local
+#spring:
+#  config:
+#    activate:
+#      on-profile: non-prod
+#  data:
+#    mongodb:
+#      host: localhost
+#      port: 27017
+#      database: local

@@ -136,7 +136,7 @@ public class MoviesInfoControllerUnitTest {
                 .expectBody(String.class)
                 .consumeWith(response -> {
                     log.info("Response: {}", response.getResponseBody());
-                    var expectedErrorMessages = "movieInfo.cast must be present,movieInfo.name must be present,movieInfo.year must be positive";
+                    var expectedErrorMessages = "movieInfo.cast : must be present,movieInfo.name : must be present,movieInfo.year : must be positive";
                     assertNotNull(response.getResponseBody());
                     assertEquals(expectedErrorMessages, response.getResponseBody());
                 });

@@ -1,4 +1,4 @@
-package com.reactivespring.review.router;
+package com.reactivespring.review;
 
 import org.testcontainers.containers.MongoDBContainer;
 

@@ -1,4 +1,4 @@
-package com.reactivespring.review.router;
+package com.reactivespring.review;
 
 import com.reactivespring.review.domain.Review;
 import com.reactivespring.review.repository.ReviewReactiveRepository;
@@ -44,6 +44,17 @@ public class ReviewReactiveRepositoryTest extends AbstractMongodbBaseTest {
         StepVerifier.create(reviews)
                 .expectSubscription()
                 .expectNextCount(3)
+                .verifyComplete();
+    }
+
+    @Test
+    void findByMovieInfoIdTest() {
+        var reviews = this.reviewReactiveRepository.findByMovieInfoId(1L).log();
+
+        //then
+        StepVerifier.create(reviews)
+                .expectSubscription()
+                .expectNextCount(1)
                 .verifyComplete();
     }
 

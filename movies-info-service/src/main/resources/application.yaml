@@ -23,9 +23,9 @@ spring:
       port: 27017
       database: local
 ---
-logging:
-  level:
-    root: debug
-    org:
-      springframework:
-        web: DEBUG
+#logging:
+#  level:
+#    root: debug
+#    org:
+#      springframework:
+#        web: DEBUG
