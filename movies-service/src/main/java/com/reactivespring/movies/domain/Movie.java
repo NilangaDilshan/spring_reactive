@@ -11,5 +11,5 @@ import java.util.List;
 @ToString
 public class Movie {
     private MovieInfo movieInfo;
-    private List<Review> review;
+    private List<Review> reviews;
 }

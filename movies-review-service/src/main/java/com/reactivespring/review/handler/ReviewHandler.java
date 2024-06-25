@@ -8,10 +8,12 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.Sinks;
 
 import java.util.stream.Collectors;
 
@@ -22,6 +24,7 @@ public class ReviewHandler {
 
     private final ReviewReactiveRepository reviewReactiveRepository;
     private final Validator validator;
+    Sinks.Many<Review> reviewSink = Sinks.many().replay().latest();
 
     public Mono<ServerResponse> addReview(ServerRequest request) {
         return request.bodyToMono(Review.class)
@@ -29,6 +32,9 @@ public class ReviewHandler {
                 .flatMap(review -> {
                     log.info("Review request to be added: {}", review);
                     return this.reviewReactiveRepository.save(review);
+                })
+                .doOnNext(review -> {
+                    reviewSink.tryEmitNext(review);
                 })
                 .flatMap(review -> ServerResponse.ok().bodyValue(review));
     }
@@ -73,5 +79,13 @@ public class ReviewHandler {
     public Mono<ServerResponse> deleteReview(ServerRequest request) {
         return this.reviewReactiveRepository.deleteById(request.pathVariable("id"))
                 .then(ServerResponse.ok().build());
+    }
+
+    public Mono<ServerResponse> getReviewsStream(ServerRequest request) {
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_NDJSON)
+                .body(reviewSink.asFlux(), Review.class)
+                .log();
+
     }
 }

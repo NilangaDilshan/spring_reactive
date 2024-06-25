@@ -240,4 +240,42 @@ class MoviesInfoControllerIntegrationTest extends AbstractMongodbBaseTest {
                 .jsonPath("$.release_date").isEqualTo("2005-06-15");
         //then
     }
+
+    @Test
+    void getAllMoviesStreamTest() {
+        //given
+        var movieInfo = new MovieInfo(null, "Batman Begins", 2005, List.of("Christian Bale", "Michael Caine", "Liam Neeson"),
+                LocalDate.of(2005, 6, 15));
+
+        //when
+        webTestClient.post()
+                .uri(MOVIES_INFO_URL)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(response -> {
+                    var responseBody = response.getResponseBody();
+                    assertNotNull(responseBody);
+                    assertEquals(movieInfo.getName(), responseBody.getName());
+                    assertEquals(movieInfo.getYear(), responseBody.getYear());
+                    assertEquals(movieInfo.getCast(), responseBody.getCast());
+                    assertEquals(movieInfo.getRelease_date(), responseBody.getRelease_date());
+                });
+
+        //when
+        var moviesStreamFlux = webTestClient.get()
+                .uri(MOVIES_INFO_URL + "/stream")
+                .exchange()
+                .expectStatus().isOk()
+                .returnResult(MovieInfo.class)
+                .getResponseBody();
+
+        //then
+        StepVerifier.create(moviesStreamFlux)
+                .assertNext(movieInfo1 -> {
+                    assert movieInfo1 != null;
+                })
+                .thenCancel().verify();
+    }
 }

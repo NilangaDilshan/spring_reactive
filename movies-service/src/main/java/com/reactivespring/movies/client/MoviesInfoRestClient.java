@@ -3,11 +3,13 @@ package com.reactivespring.movies.client;
 import com.reactivespring.movies.domain.MovieInfo;
 import com.reactivespring.movies.exception.MoviesInfoClientException;
 import com.reactivespring.movies.exception.MoviesInfoServerException;
+import com.reactivespring.movies.util.RetryUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -51,6 +53,28 @@ public class MoviesInfoRestClient {
                                     });
                         })
                 .bodyToMono(MovieInfo.class)
+                //.retry(3)
+                .retryWhen(RetryUtil.retrySpec())
+                .log();
+    }
+
+    public Flux<MovieInfo> retrieveMoviesStream() {
+        var url = movieInfoUrl.concat("/stream");
+        return webClient.get()
+                .uri(url)
+                .retrieve()
+                .onStatus(httpStatus -> httpStatus.is4xxClientError(), (clientResponse -> {
+                    log.info("Status code : {}", clientResponse.statusCode().value());
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(response -> Mono.error(new MoviesInfoClientException(response, clientResponse.statusCode().value())));
+                }))
+                .onStatus(httpStatus -> httpStatus.is5xxServerError(), (clientResponse -> {
+                    log.info("Status code : {}", clientResponse.statusCode().value());
+                    return clientResponse.bodyToMono(String.class)
+                            .flatMap(response -> Mono.error(new MoviesInfoServerException(response)));
+                }))
+                .bodyToFlux(MovieInfo.class)
+                .retryWhen(RetryUtil.retrySpec())
                 .log();
     }
 }
